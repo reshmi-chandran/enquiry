@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Send enquiry</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <section>
+        <h1>Contact us</h1>
+        <p class="tagline">
+          Fill in the form below and we will forward your message via email.
+        </p>
+        <form id="enquiry-form">
+          <label>
+            Name
+            <input type="text" name="name" placeholder="Jane Doe" required />
+          </label>
+          <label>
+            Email
+            <input
+              type="email"
+              name="email"
+              placeholder="jane@example.com"
+              required
+            />
+          </label>
+          <label>
+            Subject
+            <input type="text" name="subject" placeholder="Quick question" />
+          </label>
+          <label>
+            Message
+            <textarea
+              name="message"
+              rows="5"
+              placeholder="Hello! I would like to..."
+              required
+            ></textarea>
+          </label>
+          <button type="submit" id="submit-btn">Send message</button>
+          <p id="status" role="alert" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+    <script src="app.js" defer></script>
+  </body>
+</html>
+
