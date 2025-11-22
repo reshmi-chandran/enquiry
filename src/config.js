@@ -12,18 +12,19 @@ const parseOrigins = (value) =>
 
 const config = {
   port: Number.parseInt(process.env.PORT ?? '4000', 10),
-  brevo: {
-    apiKey: process.env.BREVO_API_KEY,
-    senderEmail: process.env.BREVO_SENDER_EMAIL,
-    senderName: process.env.BREVO_SENDER_NAME || 'Website enquiry bot',
+  sendgrid: {
+    apiKey: process.env.SENDGRID_API_KEY,
+    senderEmail: process.env.SENDGRID_SENDER_EMAIL,
+    senderName: process.env.SENDGRID_SENDER_NAME || 'Website Enquiry Bot',
   },
   clientEmail: process.env.CLIENT_EMAIL,
   allowedOrigins: parseOrigins(process.env.ALLOWED_ORIGINS),
 };
 
+// Check for SendGrid API key
 const requiredVars = [
-  ['BREVO_API_KEY', config.brevo.apiKey],
-  ['BREVO_SENDER_EMAIL', config.brevo.senderEmail],
+  ['SENDGRID_API_KEY', config.sendgrid.apiKey],
+  ['SENDGRID_SENDER_EMAIL', config.sendgrid.senderEmail],
   ['CLIENT_EMAIL', config.clientEmail],
 ];
 
@@ -38,4 +39,3 @@ if (missingVars.length > 0) {
 }
 
 module.exports = config;
-

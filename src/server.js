@@ -72,26 +72,30 @@ app.post('/api/enquiry', async (req, res) => {
     console.error('Failed to send email:', error);
     const errorBody = error.response?.body || {};
     const errorMessage = errorBody.message || error.message || 'Unknown error';
-    const errorCode = errorBody.code || error.code;
+    const errorCode = error.response?.statusCode || error.code || errorBody.code;
     
     console.error('Error details:', JSON.stringify(errorBody, null, 2));
     
     // Provide more helpful error messages for common issues
     let userMessage = 'Unable to send email right now. Please try later.';
-    if (errorCode === 'unauthorized' || errorMessage.includes('Key not found') || errorMessage.includes('Invalid')) {
-      userMessage = 'Email service configuration error. The API key is invalid or expired.';
-      console.error('⚠️  Brevo API key is invalid or expired');
-      console.error('⚠️  Please update BREVO_API_KEY in your .env file with a valid key from Brevo dashboard');
-    } else if (errorCode === 'permission_denied' || errorMessage.includes('not yet activated')) {
-      userMessage = 'Email service is not activated. Please verify your sender email in Brevo dashboard.';
-      console.error('⚠️  Brevo SMTP/Transactional Email account is not activated');
+    const errorStr = String(errorMessage).toLowerCase();
+    
+    if (errorCode === 401 || errorCode === 403 || errorStr.includes('api key') || errorStr.includes('forbidden') || errorStr.includes('unauthorized')) {
+      userMessage = 'Email service configuration error. Please check your SendGrid API key.';
+      console.error('⚠️  SendGrid API key authentication failed');
+      console.error('⚠️  Check SENDGRID_API_KEY in your .env file');
+      console.error('⚠️  Get your API key from: https://app.sendgrid.com/settings/api_keys');
+    } else if (errorCode === 403 || errorStr.includes('sender') || errorStr.includes('verified') || errorStr.includes('domain')) {
+      userMessage = 'Email service configuration error. Please verify your sender email in SendGrid.';
+      console.error('⚠️  SendGrid sender email not verified');
       console.error('⚠️  Steps to fix:');
-      console.error('   1. Go to https://app.brevo.com/settings/senders');
-      console.error('   2. Verify your sender email:', config.brevo.senderEmail);
-      console.error('   3. Or contact Brevo support at contact@brevo.com');
-    } else if (errorCode === 'invalid_parameter') {
-      userMessage = 'Email service configuration error. Please check sender email configuration.';
-      console.error('⚠️  Brevo sender email may not be verified');
+      console.error('   1. Go to https://app.sendgrid.com/settings/sender_auth/senders');
+      console.error('   2. Verify your sender email:', config.sendgrid.senderEmail);
+      console.error('   3. Or use Single Sender Verification');
+    } else if (errorCode === 400 || errorStr.includes('invalid')) {
+      userMessage = 'Email service configuration error. Please check your SendGrid configuration.';
+      console.error('⚠️  SendGrid configuration issue');
+      console.error('⚠️  Check SENDGRID_API_KEY and SENDGRID_SENDER_EMAIL');
     }
     
     res
@@ -119,9 +123,9 @@ app.use((err, _req, res, _next) => {
 if (require.main === module) {
   app.listen(config.port, () => {
     console.log(`🚀 Server ready on port ${config.port}`);
-    console.log(`📧 Brevo sender: ${config.brevo.senderEmail}`);
+    console.log(`📧 SendGrid sender: ${config.sendgrid.senderEmail}`);
     console.log(`📬 Recipient: ${config.clientEmail}`);
-    console.log(`🔑 API Key: ${config.brevo.apiKey ? config.brevo.apiKey.substring(0, 20) + '...' : 'MISSING'}`);
+    console.log(`🔑 API Key: ${config.sendgrid.apiKey ? config.sendgrid.apiKey.substring(0, 20) + '...' : 'MISSING'}`);
   });
 }
 

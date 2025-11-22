@@ -1,11 +1,12 @@
-## Brevo enquiry service
+## Enquiry Service with SendGrid
 
-Minimal Node.js + Express server that accepts contact-form submissions and forwards them through Brevo's transactional email API. A static frontend is bundled for quick testing.
+Node.js + Express server that accepts contact-form submissions and forwards them via SendGrid's email API. A static frontend is bundled for quick testing.
 
 ### Requirements
 
 - Node.js 18+
-- Brevo v3 API key with Transactional Email enabled
+- SendGrid account with API key
+- Verified sender email in SendGrid
 
 ### Setup
 
@@ -13,7 +14,7 @@ Minimal Node.js + Express server that accepts contact-form submissions and forwa
    ```bash
    npm install
    ```
-2. Copy `env.example` to `.env` and fill in your Brevo API key, sender, and recipient details
+2. Copy `env.example` to `.env` and fill in your SendGrid API key, sender, and recipient details
 3. Run the server
    ```bash
    npm run dev
@@ -25,9 +26,9 @@ Minimal Node.js + Express server that accepts contact-form submissions and forwa
 | Key               | Description                                        |
 | ----------------- | -------------------------------------------------- |
 | `PORT`            | Server port (defaults to `4000`)                   |
-| `BREVO_API_KEY`   | Brevo v3 API key (Transactional Email access)      |
-| `BREVO_SENDER_EMAIL` | Verified Brevo sender email address             |
-| `BREVO_SENDER_NAME` | Display name for the sender (defaults provided)  |
+| `SENDGRID_API_KEY` | SendGrid API key (starts with `SG.`)              |
+| `SENDGRID_SENDER_EMAIL` | Verified SendGrid sender email address         |
+| `SENDGRID_SENDER_NAME` | Display name for the sender (defaults provided)  |
 | `CLIENT_EMAIL`    | Recipient email that will receive enquiries        |
 | `ALLOWED_ORIGINS` | Optional CSV list for CORS (e.g. `http://app.com`) |
 

@@ -1,10 +1,8 @@
-const Brevo = require('sib-api-v3-sdk');
+const sgMail = require('@sendgrid/mail');
 const config = require('./config');
 
-const client = Brevo.ApiClient.instance;
-client.authentications['api-key'].apiKey = config.brevo.apiKey;
-
-const transactionalApi = new Brevo.TransactionalEmailsApi();
+// Set SendGrid API key
+sgMail.setApiKey(config.sendgrid.apiKey);
 
 const escapeHtml = (value = '') =>
   value
@@ -180,25 +178,42 @@ const buildEmailBody = (formData) => {
 const sendEnquiryEmail = async (formData) => {
   const { safeSubject, textContent, htmlContent, trimmedEmail } = buildEmailBody(formData);
 
-  const payload = {
-    sender: {
-      email: config.brevo.senderEmail,
-      name: config.brevo.senderName,
+  const msg = {
+    to: config.clientEmail,
+    from: {
+      email: config.sendgrid.senderEmail,
+      name: config.sendgrid.senderName,
     },
-    to: [{ email: config.clientEmail }],
     subject: safeSubject,
-    textContent,
-    htmlContent,
+    text: textContent,
+    html: htmlContent,
+    // Add tracking and better deliverability
+    mailSettings: {
+      sandboxMode: {
+        enable: false, // Make sure sandbox mode is OFF
+      },
+    },
   };
 
   if (trimmedEmail) {
-    payload.replyTo = { email: trimmedEmail };
+    msg.replyTo = trimmedEmail;
   }
 
-  return transactionalApi.sendTransacEmail(payload);
+  try {
+    const result = await sgMail.send(msg);
+    console.log('✅ Email sent via SendGrid');
+    console.log('📧 Message ID:', result[0]?.headers?.['x-message-id'] || 'N/A');
+    return result;
+  } catch (error) {
+    console.error('❌ SendGrid error:', error.message);
+    if (error.response) {
+      console.error('Status:', error.response.statusCode);
+      console.error('Body:', JSON.stringify(error.response.body, null, 2));
+    }
+    throw error;
+  }
 };
 
 module.exports = {
   sendEnquiryEmail,
 };
-
