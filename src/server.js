@@ -68,7 +68,12 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: 'Unexpected error occurred' });
 });
 
-app.listen(config.port, () => {
-  console.log(`🚀 Server ready on port ${config.port}`);
-});
+// Export for Vercel serverless, or start server for local development
+if (require.main === module) {
+  app.listen(config.port, () => {
+    console.log(`🚀 Server ready on port ${config.port}`);
+  });
+}
+
+module.exports = app;
 
